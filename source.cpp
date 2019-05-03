@@ -21,7 +21,7 @@ public:
 		size = 0;
 		length = 0;
 	}
-	int GetSize();
+	int GetWeight(const int& u, const int& v) const;
 	void FillRandomly();
 	void FillManually();
 	void FillVariant();
@@ -34,8 +34,8 @@ public:
 	void Bellman(const int& start);
 	void Floyd();
 };
-int Graf::GetSize() {
-	return size;
+int Graf::GetWeight(const int& u, const int& v) const{
+	return adjMatrix[u][v];
 }
 void Graf::FillRandomly() {
 	srand(time(0));
@@ -242,6 +242,33 @@ void Graf::DijkstraForAll() {
 	}
 	cout << delim;
 }
+void Graf::Bellman(const int& start) {
+	
+	//initializing the vector holding the distances from 'start' to 'n'
+	vector<int> dist(size, I);
+	dist[start] = 0;
+
+	//Running loop v-1 times because the shortest path can't hold
+	//bigger amount of endges, otherwise it will hold a cycle which can be dismissed 
+	for (int v = 1; v < size - 1; v++) {
+		//usual loop through the graf
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				//making sure we're looking through all of the exiting edges of the graf
+				if (adjMatrix[i][j] != 0 && adjMatrix[i][j] != I) {
+					//in case there's a more rational way, go with it
+					if (dist[j] > dist[i] + GetWeight(i, j)) {
+						dist[j] = dist[i] + GetWeight(i, j);
+					}
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < size; i++) {
+		cout << "v" << start << " -> v" << i << ": " << dist[i] << endl;
+	}
+}
 void Graf::Floyd() {
 	cout << delim;
 	cout << "Floyd-Warshall's algorithm is running...\n" << endl;
@@ -267,5 +294,5 @@ int main() {
 	Graf graf;
 	graf.FillVariant();
 	graf.Print();
-	graf.BFS();
+	graf.Bellman(0);
 }
