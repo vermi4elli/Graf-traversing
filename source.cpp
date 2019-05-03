@@ -33,6 +33,7 @@ public:
 	void Dijkstra(const int& start, const bool& check);
 	void DijkstraForAll();
 	void Bellman(const int& start);
+	void BellmanForAll();
 	void Floyd();
 };
 inline int Graf::GetSize() {
@@ -191,7 +192,7 @@ inline void Graf::DFS(int& start, set<int>& used, int& temp) {
 	cout << "v" << start;
 	if (temp != size) cout << " -> ";
 	for (int i = 0; i < size; i++) {
-		if (adjMatrix[start][i] == 0) continue;
+		if (adjMatrix[start][i] == 0 || adjMatrix[start][i] == I) continue;
 		if (used.count(i) != 0) continue;
 		Graf::DFS(i, used, temp);
 	};
@@ -273,6 +274,11 @@ inline void Graf::Bellman(const int& start) {
 		cout << "v" << start << " -> v" << i << ": " << dist[i] << endl;
 	}
 }
+inline void Graf::BellmanForAll() {
+	for (int i = 0; i < size; i++) {
+		Bellman(i);
+	}
+}
 inline void Graf::Floyd() {
 	cout << delim;
 	cout << "Floyd-Warshall's algorithm is running...\n" << endl;
@@ -321,8 +327,60 @@ inline Graf Process() {
 	}
 }
 
+inline void Result(Graf& graf) {
+	int command = 1;
+	while (command != 0) {
+		cout << delim;
+		cout << "What you'd like to do?" << endl;
+		cout << "1. Print the adjacency matrix" << endl;
+		cout << "2. Run the DFS" << endl;
+		cout << "3. Run the BFS" << endl;
+		cout << "4. Run the Dijkstra's algorithm" << endl;
+		cout << "5. Run the Dijkstra's algorithm for all vertexes" << endl;
+		cout << "6. Run the Bellman-Ford algorithm" << endl;
+		cout << "7. Run the Bellman-Ford algorithm for all vertexes" << endl;
+		cout << "8. Run the Floyd-Warshall algorithm" << endl;
+		cout << "0. Exit the program\n" << endl;
+		cin >> command;
+		cout << delim;
+		if (command == 1) {
+			graf.Print();
+		}
+		else if (command == 2) {
+			graf.DFSInitialization();
+		}
+		else if (command == 3) {
+			graf.BFS();
+		}
+		else if (command == 4) {
+			int temp = 0;
+			cout << "Enter the vertex you'd like to begin with: ";
+			cin >> temp;
+			graf.Dijkstra(temp, 1);
+		}
+		else if (command == 5) {
+			graf.DijkstraForAll();
+		}
+		else if (command == 6) {
+			cout << delim;
+			int temp = 0;
+			cout << "Enter the vertex you'd like to begin with: ";
+			cin >> temp;
+			graf.Bellman(temp);
+			cout << delim;
+		}
+		else if (command == 7) {
+			graf.BellmanForAll();
+		}
+		else if(command == 8) {
+			graf.Floyd();
+		}
+	}
+	cout << "The programm is closing..." << endl;
+}
+
 int main() {
 	Graf graf = Process();
-	
+	Result(graf);
 	return 0;
 }
