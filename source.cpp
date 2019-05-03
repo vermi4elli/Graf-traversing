@@ -21,6 +21,7 @@ public:
 		size = 0;
 		length = 0;
 	}
+	int GetSize();
 	int GetWeight(const int& u, const int& v) const;
 	void FillRandomly();
 	void FillManually();
@@ -34,10 +35,13 @@ public:
 	void Bellman(const int& start);
 	void Floyd();
 };
-int Graf::GetWeight(const int& u, const int& v) const{
+inline int Graf::GetSize() {
+	return size;
+}
+inline int Graf::GetWeight(const int& u, const int& v) const{
 	return adjMatrix[u][v];
 }
-void Graf::FillRandomly() {
+inline void Graf::FillRandomly() {
 	srand(time(0));
 	cout << delim;
 	cout << "Enter the amount of vertexes you want: ";
@@ -66,7 +70,7 @@ void Graf::FillRandomly() {
 	if (length.length() > this->length) this->length = length.length();
 	cout << delim;
 }
-void Graf::FillManually() {
+inline void Graf::FillManually() {
 	cout << delim;
 	cout << "Enter the amount of vertexes you want: ";
 	int size = 0, temp = 0;
@@ -89,7 +93,7 @@ void Graf::FillManually() {
 	if (length.length() > this->length) this->length = length.length();
 	cout << delim;
 }
-void Graf::FillVariant() {
+inline void Graf::FillVariant() {
 	size = 17;
 	length = 2;
 	adjMatrix = {
@@ -113,7 +117,7 @@ void Graf::FillVariant() {
 			{I, I, I, I, I, 7, I, I, I, I, I, I, 9, I, 3, I, 0},//16
 	};
 }
-void Graf::Print() {
+inline void Graf::Print() {
 	cout << delim << "Matrix of adjacency:\n\n\n";
 	int space = this->length;
 	space++;
@@ -142,7 +146,7 @@ void Graf::Print() {
 	}
 	cout << delim;
 }
-void Graf::BFS() {
+inline void Graf::BFS() {
 	cout << delim;
 	cout << "BFS is running...\n" << endl;
 	cout << "Enter the node you'd like to begin with: ";
@@ -168,7 +172,7 @@ void Graf::BFS() {
 	} while (!Queue.empty());
 	cout << delim;
 }
-void Graf::DFSInitialization() {
+inline void Graf::DFSInitialization() {
 	cout << delim;
 	cout << "DFS is running...\n" << endl;
 	cout << "Enter the node you'd like to begin with: ";
@@ -180,7 +184,7 @@ void Graf::DFSInitialization() {
 	DFS(start, used, temp);
 	cout << delim;
 }
-void Graf::DFS(int& start, set<int>& used, int& temp) {
+inline void Graf::DFS(int& start, set<int>& used, int& temp) {
 	if (used.count(start) != 0) return;
 	used.insert(start);
 	temp++;
@@ -194,7 +198,7 @@ void Graf::DFS(int& start, set<int>& used, int& temp) {
 	//cout << "\nback " << endl;
 	return;
 }
-void Graf::Dijkstra(const int& start, const bool& check) {
+inline void Graf::Dijkstra(const int& start, const bool& check) {
 	if (check == 1) {
 		cout << delim;
 		cout << "Dijkstra's algorithm is running for v" << start << " ...\n";
@@ -233,7 +237,7 @@ void Graf::Dijkstra(const int& start, const bool& check) {
 	}
 	if(check == 1)	cout << delim;
 }
-void Graf::DijkstraForAll() {
+inline void Graf::DijkstraForAll() {
 	cout << delim;
 	cout << "Dijkstra's algorithm is running for all vertexes...\n" << endl;
 	for (int i = 0; i < size; i++) {
@@ -242,7 +246,7 @@ void Graf::DijkstraForAll() {
 	}
 	cout << delim;
 }
-void Graf::Bellman(const int& start) {
+inline void Graf::Bellman(const int& start) {
 	
 	//initializing the vector holding the distances from 'start' to 'n'
 	vector<int> dist(size, I);
@@ -269,7 +273,7 @@ void Graf::Bellman(const int& start) {
 		cout << "v" << start << " -> v" << i << ": " << dist[i] << endl;
 	}
 }
-void Graf::Floyd() {
+inline void Graf::Floyd() {
 	cout << delim;
 	cout << "Floyd-Warshall's algorithm is running...\n" << endl;
 	vector<vector<int>> matrix = adjMatrix;
@@ -290,9 +294,35 @@ void Graf::Floyd() {
 	cout << delim;
 }
 
+inline Graf Process() {
+	cout << "How would you like to create a graf?" << endl;
+	cout << "1. Use the variant-given graf" << endl;
+	cout << "2. Create it manually" << endl;
+	cout << "3. Create it randomly" << endl;
+	int variant = 0;
+	cin >> variant;
+	if (variant == 1) {
+		Graf graf;
+		graf.FillVariant();
+		graf.Print();
+		return graf;
+	}
+	else if (variant == 2) {
+		Graf graf;
+		graf.FillManually();
+		graf.Print();
+		return graf;
+	}
+	else {
+		Graf graf;
+		graf.FillRandomly();
+		if (graf.GetSize() <= 30) graf.Print();
+		return graf;
+	}
+}
+
 int main() {
-	Graf graf;
-	graf.FillVariant();
-	graf.Print();
-	graf.Bellman(0);
+	Graf graf = Process();
+	
+	return 0;
 }
