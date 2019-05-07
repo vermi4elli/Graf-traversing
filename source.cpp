@@ -30,9 +30,9 @@ public:
 	void BFS();
 	void DFSInitialization();
 	void DFS(int& start, set<int>& used, int& temp);
-	void Dijkstra(const int& start, const bool& check);
+	void Dijkstra(const int& start, const bool& check, int& comparisons);
 	void DijkstraForAll();
-	void Bellman(const int& start);
+	void Bellman(const int& start, int& comparisons);
 	void BellmanForAll();
 	void Floyd();
 };
@@ -173,18 +173,6 @@ inline void Graf::BFS() {
 	} while (!Queue.empty());
 	cout << delim;
 }
-inline void Graf::DFSInitialization() {
-	cout << delim;
-	cout << "DFS is running...\n" << endl;
-	cout << "Enter the node you'd like to begin with: ";
-	int start = 0;
-	cin >> start;
-	cout << endl;
-	set<int> used;
-	int temp = 0;
-	DFS(start, used, temp);
-	cout << delim;
-}
 inline void Graf::DFS(int& start, set<int>& used, int& temp) {
 	if (used.count(start) != 0) return;
 	used.insert(start);
@@ -199,8 +187,20 @@ inline void Graf::DFS(int& start, set<int>& used, int& temp) {
 	//cout << "\nback " << endl;
 	return;
 }
-inline void Graf::Dijkstra(const int& start, const bool& check) {
-	if (check == 1) {
+inline void Graf::DFSInitialization() {
+	cout << delim;
+	cout << "DFS is running...\n" << endl;
+	cout << "Enter the node you'd like to begin with: ";
+	int start = 0;
+	cin >> start;
+	cout << endl;
+	set<int> used;
+	int temp = 0;
+	DFS(start, used, temp);
+	cout << delim;
+}
+inline void Graf::Dijkstra(const int& start, const bool& check, int& comparisons) {
+	if (check == 1 && size < 100) {
 		cout << delim;
 		cout << "Dijkstra's algorithm is running for v" << start << " ...\n";
 	}
@@ -228,31 +228,40 @@ inline void Graf::Dijkstra(const int& start, const bool& check) {
 		}
 		for (int nv = 0; nv < size; nv++) {
 			if (!used[nv] && adjMatrix[v][nv] < I) {//for all unmarked closest vertexes
+				comparisons++;
 				dist[nv] = min(dist[nv], dist[v] + adjMatrix[v][nv]);//making the distance shorter(called relaxation)
 			}
 		}
 	}
-	
-	for (rsize_t i = 0; i < dist.size(); i++) {
-		cout << "v" << start << " -> v" << i << ": " << dist[i] << endl;
+	if (size < 100) {
+		for (rsize_t i = 0; i < dist.size(); i++) {
+			cout << "v" << start << " -> v" << i << ": " << dist[i] << endl;
+		}
 	}
-	if(check == 1)	cout << delim;
+	if(check == 1 && size < 100)	cout << delim;
 }
 inline void Graf::DijkstraForAll() {
-	cout << delim;
-	cout << "Dijkstra's algorithm is running for all vertexes...\n" << endl;
+	if (size < 100) {
+		cout << delim;
+		cout << "Dijkstra's algorithm is running for all vertexes...\n" << endl;
+	}
+	int comparisons = 0;
 	for (int i = 0; i < size; i++) {
-		Dijkstra(i, 0);
+		Dijkstra(i, 0, comparisons);
 		cout << endl;
 	}
-	cout << delim;
+	if (size < 100) {
+		cout << delim;
+	}
+	else {
+		cout << "There were " << comparisons << " comparisons" << endl;
+	}
 }
-inline void Graf::Bellman(const int& start) {
+inline void Graf::Bellman(const int& start, int& comparisons) {
 	
 	//initializing the vector holding the distances from 'start' to 'n'
 	vector<int> dist(size, I);
 	dist[start] = 0;
-
 	//Running loop v-1 times because the shortest path can't hold
 	//bigger amount of endges, otherwise it will hold a cycle which can be dismissed 
 	for (int v = 1; v < size - 1; v++) {
@@ -262,6 +271,7 @@ inline void Graf::Bellman(const int& start) {
 				//making sure we're looking through all of the exiting edges of the graf
 				if (adjMatrix[i][j] != 0 && adjMatrix[i][j] != I) {
 					//in case there's a more rational way, go with it
+					comparisons++;
 					if (dist[j] > dist[i] + GetWeight(i, j)) {
 						dist[j] = dist[i] + GetWeight(i, j);
 					}
@@ -269,35 +279,53 @@ inline void Graf::Bellman(const int& start) {
 			}
 		}
 	}
-
-	for (int i = 0; i < size; i++) {
-		cout << "v" << start << " -> v" << i << ": " << dist[i] << endl;
+	if (size < 100) {
+		for (int i = 0; i < size; i++) {
+			cout << "v" << start << " -> v" << i << ": " << dist[i] << endl;
+		}
+		cout << endl;
 	}
 }
 inline void Graf::BellmanForAll() {
+	int comparisons = 0;
 	for (int i = 0; i < size; i++) {
-		Bellman(i);
+		Bellman(i, comparisons);
+	}
+	if (size >= 100) {
+		cout << "There were " << comparisons << " comparisons" << endl;
 	}
 }
 inline void Graf::Floyd() {
-	cout << delim;
-	cout << "Floyd-Warshall's algorithm is running...\n" << endl;
+	if (size < 100) {
+		cout << delim;
+		cout << "Floyd-Warshall's algorithm is running...\n" << endl;
+	}
+	int comparisons = 0;
 	vector<vector<int>> matrix = adjMatrix;
 	vector<vector<vector<int>>> matrixes;
 	matrixes.push_back(matrix);
 	for (int k = 0; k < size; k++) {
 		matrix = adjMatrix;
-		for (int i = 0; i < size; i++)
-			for (int j = 0; j < size; j++)
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
 				matrix[i][j] = min(matrixes[matrixes.size() - 1][i][j], matrixes[matrixes.size() - 1][i][k] + matrixes[matrixes.size() - 1][k][j]);
+				comparisons++;
+				cout << ".";
+			}
+		}
 		matrixes.push_back(matrix);
 	}
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++)
-			cout << "v" << i << " -> v" << j << ": " << matrix[i][j] << endl;
-		cout << endl;
+	if (size < 100) {
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++)
+				cout << "v" << i << " -> v" << j << ": " << matrix[i][j] << endl;
+			cout << endl;
+		}
+		cout << delim;
 	}
-	cout << delim;
+	else {
+		cout << "The amount of comparisons is: " << comparisons << endl;
+	}
 }
 
 inline Graf Process() {
@@ -353,20 +381,20 @@ inline void Result(Graf& graf) {
 			graf.BFS();
 		}
 		else if (command == 4) {
-			int temp = 0;
+			int temp = 0, garb = 0;
 			cout << "Enter the vertex you'd like to begin with: ";
 			cin >> temp;
-			graf.Dijkstra(temp, 1);
+			graf.Dijkstra(temp, 1, garb);
 		}
 		else if (command == 5) {
 			graf.DijkstraForAll();
 		}
 		else if (command == 6) {
 			cout << delim;
-			int temp = 0;
+			int temp = 0, garb = 0;
 			cout << "Enter the vertex you'd like to begin with: ";
 			cin >> temp;
-			graf.Bellman(temp);
+			graf.Bellman(temp, garb);
 			cout << delim;
 		}
 		else if (command == 7) {
