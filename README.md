@@ -1,2 +1,6 @@
-# Laba--7
-Лаба по ДС - 19 вариант(9-ый)
+# Graf traversing
+- Bread-first Search
+- Depth-first Search
+-	Dijkstra algorithm
+-	Bellman-Ford algorithm
+- Floyd algorithm
